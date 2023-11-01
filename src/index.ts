@@ -1,13 +1,30 @@
 import express from "express"
 import {PrismaClient} from "@prisma/client"
+import {IUserRepository} from "./repositories"
+import UserRepository from "./repositories/user"
+import {IUserHandler} from "./handler"
+import UserHandler from "./handler/user"
 
-const PORT = Number(process.env.PORT || 8080)
+const PORT = Number(process.env.PORT || 8888)
 const app = express()
+const client = new PrismaClient()
+
+const userRepo: IUserRepository = new UserRepository(client)
+
+const userHandler: IUserHandler = new UserHandler(userRepo)
+
+app.use(express.json())
 
 app.get("/", (req, res) => {
-  return res.status(200).send("welcome to LearnHub").end()
+  return res.status(200).send("Welcome To LearnHub")
 })
 
+const userRouter = express.Router()
+
+app.use("/user", userRouter)
+
+userRouter.post("/", userHandler.registeration)
+
 app.listen(PORT, () => {
-  console.log(`LernHub API is up at ${PORT}`)
+  console.log(`LearHub API is up at ${PORT}`)
 })
