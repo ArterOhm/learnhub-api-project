@@ -1,30 +1,42 @@
-import express from "express"
-import {PrismaClient} from "@prisma/client"
-import {IUserRepository} from "./repositories"
-import UserRepository from "./repositories/user"
-import {IUserHandler} from "./handler"
-import UserHandler from "./handler/user"
+import { PrismaClient } from "@prisma/client";
+import express from "express";
+import { IUserHandler } from "./handlers";
+import UserHandler from "./handlers/user";
+import JWTMiddleware from "./middleware/jwt";
+import { IUserRepository } from "./repositories";
+import UserRepository from "./repositories/user";
 
-const PORT = Number(process.env.PORT || 8888)
-const app = express()
-const client = new PrismaClient()
+const PORT = Number(process.env.PORT || 8888);
+const app = express();
+const clnt = new PrismaClient();
 
-const userRepo: IUserRepository = new UserRepository(client)
+const userRepo: IUserRepository = new UserRepository(clnt);
 
-const userHandler: IUserHandler = new UserHandler(userRepo)
+const userHandler: IUserHandler = new UserHandler(userRepo);
 
-app.use(express.json())
+const jwtMiddleware = new JWTMiddleware();
 
-app.get("/", (req, res) => {
-  return res.status(200).send("Welcome To LearnHub")
-})
+app.use(express.json());
 
-const userRouter = express.Router()
+app.get("/", jwtMiddleware.auth, (req, res) => {
+  console.log(res.locals);
+  return res.status(200).send("Welcome to LearnHub").end();
+});
 
-app.use("/user", userRouter)
+const userRouter = express.Router();
 
-userRouter.post("/", userHandler.registeration)
+app.use("/user", userRouter);
+
+userRouter.post("/", userHandler.registration);
+
+const authRouter = express.Router();
+
+app.use("/auth", authRouter);
+
+authRouter.post("/login", userHandler.login);
+
+authRouter.get("/me", jwtMiddleware.auth, userHandler.selfcheck);
 
 app.listen(PORT, () => {
-  console.log(`LearHub API is up at ${PORT}`)
-})
+  console.log(`LearnHub API is up at ${PORT}`);
+});

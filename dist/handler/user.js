@@ -9,26 +9,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcypt_1 = require("../utils/bcypt");
+const bcrypt_1 = require("../utils/bcrypt");
 class UserHandler {
     constructor(repo) {
-        this.registeration = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { name, username, password: plainPassword } = req.body;
-            const { id: registeredId, name: registeredName, registeredAt, username: registeredUsername, } = yield this.repo.create({
+        this.registration = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { name, username, password } = req.body;
+            if (typeof name !== "string" || name.length === 0)
+                return res.status(400).json({ message: "name is invalid" });
+            if (typeof username !== "string" || username.length === 0)
+                return res.status(400).json({ message: "username is invalid" });
+            if (typeof password !== "string" || password.length < 5)
+                return res.status(400).json({ message: "password is invalid" });
+            // try {
+            const result = yield this.repo.create({
                 name,
                 username,
-                password: (0, bcypt_1.hashPassword)(plainPassword),
+                password: (0, bcrypt_1.hashPassword)(password),
             });
+            const userRes = Object.assign(Object.assign({}, result), { registeredAt: result.registeredAt.toUTCString() });
             return res
                 .status(201)
-                .json({
-                id: registeredId,
-                name: registeredName,
-                registeredAt: `${registeredAt}`,
-                username: registeredUsername,
-            })
+                .json(userRes)
                 .end();
-            // const plainPassword = req.body.password;
+            // } catch (error) {
+            //   if (error instanceof UserCreationError) {
+            //     return res.status(500).json({
+            //       message: `${error.column} is invalid`,
+            //     });
+            //   }
+            //   return res.status(500).json({
+            //     message: `Internal Server Error`,
+            //   });
+            // }
         });
         this.repo = repo;
     }

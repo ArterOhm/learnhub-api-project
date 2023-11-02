@@ -12,22 +12,22 @@ datasource db {
 
 model User {
   id           String    @id @default(uuid()) @db.Uuid
-  name         String
-  username     String    @unique
-  password     String
+  name         String    @db.VarChar(255)
+  username     String    @unique @db.VarChar(255)
+  password     String    @db.VarChar(255)
   registeredAt DateTime  @default(now())
   Content      Content[]
 }
 
 model Content {
   id           Int      @id @default(autoincrement())
-  videoTitle   String
-  videoUrl     String
-  comment      String
+  videoTitle   String   @db.VarChar(255)
+  videoUrl     String   @db.VarChar()
+  comment      String   @db.VarChar(250)
   rating       Int
-  thumbnailUrl String
-  creatorName  String
-  creatorUrl   String
+  thumbnailUrl String   @db.VarChar()
+  creatorName  String   @db.VarChar(255)
+  creatorUrl   String   @db.VarChar()
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
   User         User     @relation(fields: [ownerId], references: [id])
