@@ -1,9 +1,10 @@
-import {compareSync, genSaltSync, hashSync} from "bcryptjs"
+import { compareSync, genSaltSync, hashSync } from "bcryptjs";
 
 export const hashPassword = (plaintext: string): string => {
-  const salt = genSaltSync(12)
-  return hashSync(plaintext, salt)
-}
+  const salt = genSaltSync(12);
 
-export const verifyPassword = (plaintex: string, hashVal: string): boolean =>
-  compareSync(plaintex, hashVal)
+  return hashSync(plaintext, salt);
+};
+
+export const verifyPassword = (plaintext: string, hashVal: string): boolean =>
+  compareSync(plaintext, hashVal);

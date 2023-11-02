@@ -19,10 +19,30 @@ class UserRepository {
                 data: user,
                 select: {
                     id: true,
-                    username: true,
                     name: true,
+                    username: true,
                     registeredAt: true,
                 },
+            });
+        });
+    }
+    findByUsername(username) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.prisma.user.findUniqueOrThrow({
+                where: { username },
+            });
+        });
+    }
+    findById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.prisma.user.findUniqueOrThrow({
+                select: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    registeredAt: true,
+                },
+                where: { id },
             });
         });
     }
