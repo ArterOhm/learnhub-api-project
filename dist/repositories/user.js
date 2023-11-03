@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const const_1 = require("../const");
 class UserRepository {
     constructor(prisma) {
         this.prisma = prisma;
@@ -17,12 +18,7 @@ class UserRepository {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.prisma.user.create({
                 data: user,
-                select: {
-                    id: true,
-                    name: true,
-                    username: true,
-                    registeredAt: true,
-                },
+                select: const_1.DATA_USER_SELECT,
             });
         });
     }
@@ -36,13 +32,8 @@ class UserRepository {
     findById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.prisma.user.findUniqueOrThrow({
-                select: {
-                    id: true,
-                    name: true,
-                    username: true,
-                    registeredAt: true,
-                },
                 where: { id },
+                select: const_1.DATA_USER_SELECT,
             });
         });
     }

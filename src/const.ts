@@ -27,3 +27,6 @@ export const DATA_SELECT : Prisma.ContentSelect = {
   updatedAt: true,
   User:{select:DATA_USER_SELECT},
 }
+
+
+

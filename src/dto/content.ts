@@ -26,3 +26,8 @@ export interface IContentDto  {
   updatedAt: string;
 }
 
+export interface  IContentAllDto {
+  
+}
+
+

@@ -28,6 +28,10 @@ export interface IContent {
   User: IUser;
 }
 
+export interface IContents {
+  data: IContent[]
+}
+
 export interface IUserRepository {
   create(user: ICreateUserDto): Promise<IUser>;
   findByUsername(username: string): Promise<User>;

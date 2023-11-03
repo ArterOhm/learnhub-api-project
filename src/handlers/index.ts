@@ -4,7 +4,7 @@ import { IErrorDto } from "../dto/error";
 import { ICreateUserDto, IUserDto } from "../dto/user";
 import { AuthStatus } from "../middleware/jwt";
 import { IContentDto, ICreateContentDto, ICreateUpdateDto } from "../dto/content";
-import { IContent } from "../repositories";
+import { IContent, IContents, } from "../repositories";
 import { Content } from "@prisma/client";
 
 
@@ -27,7 +27,7 @@ export interface IUserHandler {
 }
 
 export interface IContentHandler {
-  getAll: RequestHandler<Empty,IContent[]>;
+  getAll: RequestHandler<Empty,IContents>;
   getById: RequestHandler<ID, IContent| IErrorDto ,undefined,
   AuthStatus>;
   create: RequestHandler<

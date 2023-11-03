@@ -3,7 +3,7 @@ import { Empty, IContentHandler, ID } from ".";
 import { IContentDto, ICreateContentDto, ICreateUpdateDto, } from "../dto/content";
 import { IErrorDto } from "../dto/error";
 import { AuthStatus } from "../middleware/jwt";
-import { IContent, IContentRepository } from "../repositories";
+import { IContent, IContentRepository, IContents } from "../repositories";
 import { getOEmbedInfo } from "../utils/oemdeb";
 import { Content } from "@prisma/client";
 
@@ -14,9 +14,10 @@ export default class ContentHandler implements IContentHandler {
     this.repo = repo;
   }
 
-public getAll: RequestHandler<Empty, IContent[]> = async (req, res) => {
-    const result = await this.repo.getAll();
-      return res.status(200).json(result).end();
+public getAll: RequestHandler<Empty, IContents> = async (req, res) => {
+    const data = await this.repo.getAll();
+    const datas = {data} 
+      return res.status(200).json(datas).end();
   };
   public getById: RequestHandler<ID, IContent | IErrorDto ,undefined,
   AuthStatus> = async (req, res) => {
