@@ -7,6 +7,22 @@ export interface ICreateContentDto {
   rating: number;
 }
 
-export interface IContentDto extends Omit<Content, "ownerId" | "id"> {
-  postedBy: IUserDto;
+export interface ICreateUpdateDto {
+  comment: string
+  rating: number
 }
+
+export interface IContentDto  {
+  postedBy: IUserDto;
+  id: number;
+  videoTitle: string;
+  videoUrl: string;
+  comment: string;
+  rating: number;
+  thumbnailUrl: string;
+  creatorName: string;
+  creatorUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

@@ -1,24 +1,58 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const const_1 = require("../const");
 class ContentRepository {
     constructor(prisma) {
         this.prisma = prisma;
+    }
+    getAll() {
+        return this.prisma.content.findMany({
+            select: {
+                id: true,
+                comment: true,
+                videoUrl: true,
+                videoTitle: true,
+                thumbnailUrl: true,
+                creatorUrl: true,
+                creatorName: true,
+                rating: true,
+                createdAt: true,
+                updatedAt: true,
+                User: {
+                    select: {
+                        id: true,
+                        name: true,
+                        username: true,
+                        registeredAt: true,
+                    },
+                },
+            },
+        });
+    }
+    getById(id) {
+        return this.prisma.content.findUniqueOrThrow({
+            where: { id: Number(id) },
+            select: const_1.DATA_SELECT
+        });
     }
     create(ownerId, content) {
         return this.prisma.content.create({
             data: Object.assign(Object.assign({}, content), { User: {
                     connect: { id: ownerId },
                 } }),
-            include: {
-                User: {
-                    select: {
-                        id: true,
-                        username: true,
-                        name: true,
-                        registeredAt: true,
-                    },
-                },
-            },
+            select: const_1.DATA_SELECT
+        });
+    }
+    update(id, contentUpdate) {
+        return this.prisma.content.update({
+            where: { id: Number(id) },
+            data: Object.assign(Object.assign({}, contentUpdate), { updatedAt: new Date() }),
+            select: const_1.DATA_SELECT
+        });
+    }
+    delete(id) {
+        return this.prisma.content.delete({
+            where: { id: Number(id) },
         });
     }
 }

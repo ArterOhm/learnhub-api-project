@@ -37,7 +37,6 @@ export default class UserHandler implements IUserHandler {
         .end();
     } catch (error) {
       console.error(error);
-
       return res
         .status(500)
         .send({

@@ -3,7 +3,16 @@ import { ICredentialDto, ILoginDto } from "../dto/auth";
 import { IErrorDto } from "../dto/error";
 import { ICreateUserDto, IUserDto } from "../dto/user";
 import { AuthStatus } from "../middleware/jwt";
-import { IContentDto, ICreateContentDto } from "../dto/content";
+import { IContentDto, ICreateContentDto, ICreateUpdateDto } from "../dto/content";
+import { IContent } from "../repositories";
+import { Content } from "@prisma/client";
+
+
+export interface ID {
+  id: number;
+}
+
+export interface Empty {}
 
 export interface IUserHandler {
   registration: RequestHandler<{}, IUserDto | IErrorDto, ICreateUserDto>;
@@ -18,6 +27,9 @@ export interface IUserHandler {
 }
 
 export interface IContentHandler {
+  getAll: RequestHandler<Empty,IContent[]>;
+  getById: RequestHandler<ID, IContent| IErrorDto ,undefined,
+  AuthStatus>;
   create: RequestHandler<
     {},
     IContentDto | IErrorDto,
@@ -25,4 +37,9 @@ export interface IContentHandler {
     undefined,
     AuthStatus
   >;
+  updateById: RequestHandler<ID, IContent | IErrorDto, ICreateUpdateDto,undefined,
+  AuthStatus>;
+  deleteById: RequestHandler<ID, Content| IErrorDto ,undefined,
+  AuthStatus>;
 }
+
