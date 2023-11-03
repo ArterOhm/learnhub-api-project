@@ -18,10 +18,6 @@ public getAll: RequestHandler<Empty, IContent[]> = async (req, res) => {
     const result = await this.repo.getAll();
       return res.status(200).json(result).end();
   };
-
-
-
-
   public getById: RequestHandler<ID, IContent | IErrorDto ,undefined,
   AuthStatus> = async (req, res) => {
   try {
@@ -36,11 +32,6 @@ public getAll: RequestHandler<Empty, IContent[]> = async (req, res) => {
   return res.status(500).json({ message: "internal server error" }).end();
 }
 }
-
-
-
-
-
 public create: RequestHandler<
     {},
     IContentDto | IErrorDto,
