@@ -1,5 +1,5 @@
 import { Content, PrismaClient } from "@prisma/client";
-import { IContent, IContentRepository, ICreateContent, IUpdateContent } from ".";
+import { IContent, IContentRepository, IContents, ICreateContent, IUpdateContent } from ".";
 import { DATA_SELECT, DATA_USER_SELECT } from "../const";
 
 
@@ -12,6 +12,7 @@ export default class ContentRepository implements IContentRepository {
     return this.prisma.content.findMany({
       select: DATA_SELECT
     })
+
   }
   public  getById(id: number): Promise<IContent> {
     return  this.prisma.content.findUniqueOrThrow({

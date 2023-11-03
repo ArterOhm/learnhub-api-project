@@ -24,8 +24,9 @@ const oemdeb_1 = require("../utils/oemdeb");
 class ContentHandler {
     constructor(repo) {
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.repo.getAll();
-            return res.status(200).json(result).end();
+            const data = yield this.repo.getAll();
+            const datas = { data };
+            return res.status(200).json(datas).end();
         });
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
