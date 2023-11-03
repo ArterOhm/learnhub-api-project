@@ -5,10 +5,8 @@ import { JWT_SECRET } from "../const";
 export interface AuthStatus {
   user: { id: string };
 }
-
 export default class JWTMiddleware {
   constructor() {}
-
   auth: RequestHandler<unknown, unknown, unknown, unknown, AuthStatus> = (
     req,
     res,
@@ -22,7 +20,6 @@ export default class JWTMiddleware {
           id,
         },
       };
-
       return next();
     } catch (error) {
       console.error(error);
