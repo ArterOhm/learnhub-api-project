@@ -1,20 +1,42 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { RequestHandler } from "express";
-import { sign } from "jsonwebtoken";
-import { IUserHandler } from ".";
-import { JWT_SECRET } from "../const";
-import { ICredentialDto, ILoginDto } from "../dto/auth";
-import { IErrorDto } from "../dto/error";
-import { ICreateUserDto, IUserDto } from "../dto/user";
-import { AuthStatus } from "../middleware/jwt";
-import { IUserRepository } from "../repositories";
-import { hashPassword, verifyPassword } from "../utils/bcrypt";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library"
+import {RequestHandler} from "express"
+import {sign} from "jsonwebtoken"
+import {IUserHandler, UserName} from "."
+import {JWT_SECRET} from "../const"
+import {ICredentialDto, ILoginDto} from "../dto/auth"
+import {IErrorDto} from "../dto/error"
+import {ICreateUserDto, IUserDto} from "../dto/user"
+import {AuthStatus} from "../middleware/jwt"
+import {IUserRepository} from "../repositories"
+import {hashPassword, verifyPassword} from "../utils/bcrypt"
 
 export default class UserHandler implements IUserHandler {
-  private repo: IUserRepository;
+  private repo: IUserRepository
 
   constructor(repo: IUserRepository) {
-    this.repo = repo;
+    this.repo = repo
+  }
+
+  public userName: RequestHandler<
+    UserName,
+    IUserDto | IErrorDto,
+    undefined,
+    undefined
+  > = async (req, res) => {
+    try {
+      const {...UserData} = await this.repo.getByUsername(req.params.username)
+      const username = {
+        ...UserData,
+        registeredAt: UserData.registeredAt.toISOString(),
+      }
+      return res.status(200).json(username).end()
+    } catch (error) {
+      console.log(error)
+      if (error instanceof Error) {
+        return res.status(404).json({message: error.message}).end()
+      }
+      return res.status(500).json({message: "internal server error"}).end()
+    }
   }
   public selfcheck: RequestHandler<
     {},
@@ -24,9 +46,9 @@ export default class UserHandler implements IUserHandler {
     AuthStatus
   > = async (req, res) => {
     try {
-      const { registeredAt, ...others } = await this.repo.findById(
+      const {registeredAt, ...others} = await this.repo.findById(
         res.locals.user.id
-      );
+      )
 
       return res
         .status(200)
@@ -34,61 +56,60 @@ export default class UserHandler implements IUserHandler {
           ...others,
           registeredAt: registeredAt.toISOString(),
         })
-        .end();
+        .end()
     } catch (error) {
-      console.error(error);
+      console.error(error)
       return res
         .status(500)
         .send({
           message: "Internal Server Error",
         })
-        .end();
+        .end()
     }
-  };
+  }
 
   public login: RequestHandler<{}, ICredentialDto | IErrorDto, ILoginDto> =
     async (req, res) => {
-      const { username, password: plainPassword } = req.body;
+      const {username, password: plainPassword} = req.body
       try {
-        const { password, id } = await this.repo.findByUsername(username);
+        const {password, id} = await this.repo.findByUsername(username)
 
         if (!verifyPassword(plainPassword, password))
-          throw new Error("Invalid username or password");
-
-        const accessToken = sign({ id }, JWT_SECRET, {
+          throw new Error("Invalid username or password")
+        const accessToken = sign({id}, JWT_SECRET, {
           algorithm: "HS512",
           expiresIn: "12h",
           issuer: "learnhub-api",
           subject: "user-credential",
-        });
+        })
 
         return res
           .status(200)
           .json({
             accessToken,
           })
-          .end();
+          .end()
       } catch (error) {
         return res
           .status(401)
-          .json({ message: "Invalid username or password" })
-          .end();
+          .json({message: "Invalid username or password"})
+          .end()
       }
-    };
+    }
 
   public registration: RequestHandler<
     {},
     IUserDto | IErrorDto,
     ICreateUserDto
   > = async (req, res) => {
-    const { name, username, password: plainPassword } = req.body;
+    const {name, username, password: plainPassword} = req.body
 
     if (typeof name !== "string" || name.length === 0)
-      return res.status(400).json({ message: "name is invalid" }).end();
+      return res.status(400).json({message: "name is invalid"}).end()
     if (typeof username !== "string" || username.length === 0)
-      return res.status(400).json({ message: "username is invalid" }).end();
+      return res.status(400).json({message: "username is invalid"}).end()
     if (typeof plainPassword !== "string" || plainPassword.length < 5)
-      return res.status(400).json({ message: "password is invalid" }).end();
+      return res.status(400).json({message: "password is invalid"}).end()
 
     try {
       const {
@@ -100,7 +121,7 @@ export default class UserHandler implements IUserHandler {
         name,
         username,
         password: hashPassword(plainPassword),
-      });
+      })
 
       return res
         .status(201)
@@ -110,7 +131,7 @@ export default class UserHandler implements IUserHandler {
           registeredAt: `${registeredAt}`,
           username: registeredUsername,
         })
-        .end();
+        .end()
     } catch (error) {
       if (
         error instanceof PrismaClientKnownRequestError &&
@@ -121,14 +142,14 @@ export default class UserHandler implements IUserHandler {
           .json({
             message: `name is invalid`,
           })
-          .end();
+          .end()
       }
       return res
         .status(500)
         .json({
           message: `Internal Server Error`,
         })
-        .end();
+        .end()
     }
-  };
+  }
 }

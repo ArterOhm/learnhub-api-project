@@ -25,12 +25,13 @@ class ContentHandler {
     constructor(repo) {
         this.getAll = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const data = yield this.repo.getAll();
-            const datas = { data };
-            return res.status(200).json(datas).end();
+            const dataObject = { data };
+            return res.status(200).json(dataObject).end();
         });
         this.getById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield this.repo.getById(req.params.id);
+                const id = Number(req.params.id);
+                const result = yield this.repo.getById(id);
                 return res.status(200).json(result).end();
             }
             catch (error) {
@@ -62,10 +63,7 @@ class ContentHandler {
                 const createdAt = data.createdAt;
                 const updatedAt = data.updatedAt;
                 const result = Object.assign(Object.assign({}, contentData), { createdAt: createdAt.toISOString(), updatedAt: updatedAt.toISOString(), postedBy: Object.assign({ registeredAt: registeredAt.toISOString() }, userData) });
-                return res
-                    .status(201)
-                    .json(result)
-                    .end();
+                return res.status(201).json(result).end();
             }
             catch (error) {
                 console.log(error);
@@ -77,6 +75,10 @@ class ContentHandler {
         });
         this.updateById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
+                const id = Number(req.params.id);
+                if (isNaN(id)) {
+                    return res.status(400).send({ message: "id invalid" });
+                }
                 const { comment, rating } = req.body;
                 if (typeof comment !== "string")
                     return res.status(400).send({ message: "comment is not a string" });
@@ -84,11 +86,15 @@ class ContentHandler {
                     return res.status(400).send({ message: "rating is not a string" });
                 if (rating < 0 || rating > 5)
                     return res.status(400).send({ message: "rating of range 0-5" });
-                const result = yield this.repo.update(req.params.id, {
+                const content = yield this.repo.getById(id);
+                if (content.User.id !== res.locals.user.id)
+                    throw new Error("You're not the owner of this content!");
+                const updeteData = yield this.repo.update(id, {
                     comment,
                     rating,
+                    updatedAt: new Date(),
                 });
-                const contentUpdate = Object.assign(Object.assign({}, req.body), result);
+                const contentUpdate = Object.assign(Object.assign({}, req.body), updeteData);
                 return res.status(200).json(contentUpdate).end();
             }
             catch (error) {
@@ -101,13 +107,20 @@ class ContentHandler {
         });
         this.deleteById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const result = yield this.repo.delete(req.params.id);
+                const id = Number(req.params.id);
+                const result = yield this.repo.delete(id);
+                if (isNaN(id))
+                    return res.status(404).json({ message: "Not a Number" });
+                if (req.params.id !== res.locals.user.id)
+                    return res
+                        .status(403)
+                        .json({ message: "You're not the owner of this content!" });
                 return res.status(200).json(result).end();
             }
             catch (error) {
                 console.log(error);
                 if (error instanceof Error) {
-                    return res.status(400).json({ message: error.message }).end();
+                    return res.status(400).json({ message: "Not found" }).end();
                 }
                 return res.status(500).json({ message: "internal server error" }).end();
             }

@@ -26,6 +26,20 @@ const const_1 = require("../const");
 const bcrypt_1 = require("../utils/bcrypt");
 class UserHandler {
     constructor(repo) {
+        this.userName = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const UserData = __rest(yield this.repo.getByUsername(req.params.username), []);
+                const username = Object.assign(Object.assign({}, UserData), { registeredAt: UserData.registeredAt.toISOString() });
+                return res.status(200).json(username).end();
+            }
+            catch (error) {
+                console.log(error);
+                if (error instanceof Error) {
+                    return res.status(404).json({ message: error.message }).end();
+                }
+                return res.status(500).json({ message: "internal server error" }).end();
+            }
+        });
         this.selfcheck = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const _a = yield this.repo.findById(res.locals.user.id), { registeredAt } = _a, others = __rest(_a, ["registeredAt"]);
