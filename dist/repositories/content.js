@@ -7,13 +7,13 @@ class ContentRepository {
     }
     getAll() {
         return this.prisma.content.findMany({
-            select: const_1.DATA_SELECT
+            select: const_1.DATA_SELECT,
         });
     }
     getById(id) {
         return this.prisma.content.findUniqueOrThrow({
-            where: { id: Number(id) },
-            select: const_1.DATA_SELECT
+            where: { id: id },
+            select: const_1.DATA_SELECT,
         });
     }
     create(ownerId, content) {
@@ -21,14 +21,14 @@ class ContentRepository {
             data: Object.assign(Object.assign({}, content), { User: {
                     connect: { id: ownerId },
                 } }),
-            select: const_1.DATA_SELECT
+            select: const_1.DATA_SELECT,
         });
     }
     update(id, contentUpdate) {
         return this.prisma.content.update({
-            where: { id: Number(id) },
-            data: Object.assign(Object.assign({}, contentUpdate), { updatedAt: new Date() }),
-            select: const_1.DATA_SELECT
+            where: { id: id },
+            data: Object.assign({}, contentUpdate),
+            select: const_1.DATA_SELECT,
         });
     }
     delete(id) {
