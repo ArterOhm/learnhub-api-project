@@ -6,9 +6,13 @@ jobs:
   hello-word:
     runs-on: ubuntu-latest
     steps:
-      - name: Echo hello-word
+      - name: Print out hello-word
         run: echo "Hello, world."
-      - name: กูอยู่ไหน
+      - name: Print out current
         run: pwd
-      - name: มีอะไรบ้าง
+      - name: Check out
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: .
+      - name: Print out lists
         run: ls
