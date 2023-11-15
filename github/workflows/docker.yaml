@@ -1,0 +1,8 @@
+name: Docker build image
+
+job:
+  hello-word:
+    run-on: ubuntu-latest
+    steps:
+      - name: Echo hello-word
+        run: echo "Hello, world"
