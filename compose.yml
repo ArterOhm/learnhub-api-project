@@ -1,12 +1,9 @@
 version: "3.8"
 services:
   api:
-    image: aef1172/learnhub-api-project:feat.github-workflows-42a2786
+    build: .
     platform: linux/amd64
     environment:
-      - DATABASE_URL=postgresql://postgres:academy@pg-db:5432/learnhub-db?schema=public
-      - PORT=8080
-      - JWT_SECRET=0x7393fbc185a7fb62ef8a451d3e526bf30575d721
       - REDIS_URL=redis://cache:6379/
     ports:
       - 8080:8080
@@ -17,7 +14,7 @@ services:
     environment:
       - POSTGRES_PASSWORD=academy
     volumes:
-      - learnhub-db-vol:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     ports:
       - 5432:5432
   cache:
@@ -25,5 +22,5 @@ services:
     expose:
       - 6379
 volumes:
-  learnhub-db-vol:
-    name: e53333ec7a4ecaaab93aeed95f96b2457848f3a66ba1dfdfc5b2f7de194fa277
+  # The `db-data` volume persists the database data between container restarts.
+  db-data:
