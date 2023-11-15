@@ -1,8 +1,14 @@
 name: Docker build image
 
+on: push
+
 job:
   hello-word:
     run-on: ubuntu-latest
     steps:
       - name: Echo hello-word
-        run: echo "Hello, world"
+        run: echo "Hello, world."
+      - name: กูอยู่ไหน
+        run: pwd
+      - name: มีอะไรบ้าง
+        run: ls
