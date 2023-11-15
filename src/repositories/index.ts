@@ -45,3 +45,8 @@ export interface IContentRepository {
   update(id: number, contentUpdate: ICreateUpdateDto): Promise<IContent>
   delete(id: number): Promise<Content>
 }
+
+export interface IBlackListRepository {
+  addToBlacklist(token: string, exp: Date): Promise<void>
+  isAlreadyBlacklisted(token: string): Promise<boolean>
+}

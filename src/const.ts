@@ -1,20 +1,20 @@
-import { Prisma } from "@prisma/client";
+import {Prisma} from "@prisma/client"
 
-const { JWT_SECRET: ENV_JWT_SECRET } = process.env;
+const {JWT_SECRET: ENV_JWT_SECRET} = process.env
 
 if (!ENV_JWT_SECRET)
-  throw new Error("Environment variable: JWT_SECRET is not configured");
+  throw new Error("Environment variable: JWT_SECRET is not configured")
 
-export const JWT_SECRET = ENV_JWT_SECRET;
+export const JWT_SECRET = ENV_JWT_SECRET
 
-export const DATA_USER_SELECT : Prisma.UserSelect  = {
+export const DATA_USER_SELECT: Prisma.UserSelect = {
   id: true,
   name: true,
   username: true,
   registeredAt: true,
 }
 
-export const DATA_SELECT : Prisma.ContentSelect = {
+export const DATA_SELECT: Prisma.ContentSelect = {
   id: true,
   comment: true,
   videoUrl: true,
@@ -25,8 +25,9 @@ export const DATA_SELECT : Prisma.ContentSelect = {
   rating: true,
   createdAt: true,
   updatedAt: true,
-  User:{select:DATA_USER_SELECT},
+  User: {select: DATA_USER_SELECT},
 }
 
+export const BLACKLIST_REDIS_KEY_PREFIX = "bl_"
 
-
+export const BLACKLIST_REDIS_VALUE = "1"

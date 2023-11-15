@@ -125,13 +125,13 @@ export default class ContentHandler implements IContentHandler {
   > = async (req, res) => {
     try {
       const id = Number(req.params.id)
-      const result = await this.repo.delete(id)
       if (isNaN(id)) return res.status(404).json({message: "Not a Number"})
-      if (req.params.id !== res.locals.user.id)
+      const content = await this.repo.getById(id)
+      if (content.User.id !== res.locals.user.id)
         return res
           .status(403)
           .json({message: "You're not the owner of this content!"})
-
+      const result = await this.repo.delete(id)
       return res.status(200).json(result).end()
     } catch (error) {
       console.log(error)

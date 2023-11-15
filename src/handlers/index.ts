@@ -6,13 +6,14 @@ import {AuthStatus} from "../middleware/jwt"
 import {IContentDto, ICreateContentDto, ICreateUpdateDto} from "../dto/content"
 import {IContent, IContents} from "../repositories"
 import {Content} from "@prisma/client"
+import {IMessageDto} from "../dto/message"
 
 export interface UserName {
   username: string
 }
 
 export interface ID {
-  id: string
+  id: Number
 }
 
 export interface Empty {}
@@ -20,6 +21,7 @@ export interface Empty {}
 export interface IUserHandler {
   registration: RequestHandler<{}, IUserDto | IErrorDto, ICreateUserDto>
   login: RequestHandler<{}, ICredentialDto | IErrorDto, ILoginDto>
+  logout: RequestHandler<{}, IMessageDto, undefined, undefined, AuthStatus>
   userName: RequestHandler<UserName, IUserDto | IErrorDto, undefined, undefined>
   selfcheck: RequestHandler<
     {},

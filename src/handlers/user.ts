@@ -1,6 +1,6 @@
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library"
 import {RequestHandler} from "express"
-import {sign} from "jsonwebtoken"
+import {JwtPayload, sign, verify} from "jsonwebtoken"
 import {IUserHandler, UserName} from "."
 import {JWT_SECRET} from "../const"
 import {ICredentialDto, ILoginDto} from "../dto/auth"
@@ -9,6 +9,7 @@ import {ICreateUserDto, IUserDto} from "../dto/user"
 import {AuthStatus} from "../middleware/jwt"
 import {IUserRepository} from "../repositories"
 import {hashPassword, verifyPassword} from "../utils/bcrypt"
+import {IMessageDto} from "../dto/message"
 
 export default class UserHandler implements IUserHandler {
   private repo: IUserRepository
@@ -96,6 +97,28 @@ export default class UserHandler implements IUserHandler {
           .end()
       }
     }
+
+  public logout: RequestHandler<
+    {},
+    IMessageDto,
+    undefined,
+    undefined,
+    AuthStatus
+  > = async (req, res) => {
+    const authHeader = req.header("AuthoriZation")
+    if (!authHeader)
+      return res.status(400).send({message: "Authorization header is expected"})
+
+    const token = authHeader.replace("Bearer ", "").trim()
+
+    const decoded = verify(token, JWT_SECRET) as JwtPayload
+
+    const exp = decoded.exp
+
+    if (!exp) return res.status(400).send({message: "Exp is missing"}).end()
+
+    // await this.BlacklistRepo.
+  }
 
   public registration: RequestHandler<
     {},

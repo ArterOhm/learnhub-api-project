@@ -8,6 +8,7 @@ import UserRepository from "./repositories/user"
 import ContentRepository from "./repositories/content"
 import ContentHandler from "./handlers/conent"
 import cors from "cors"
+import {createClient} from "redis"
 
 const PORT = Number(process.env.PORT || 8888)
 const app = express()
