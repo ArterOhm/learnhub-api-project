@@ -2,9 +2,9 @@ name: Docker build image
 
 on: push
 
-job:
+jobs:
   hello-word:
-    run-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Echo hello-word
         run: echo "Hello, world."
