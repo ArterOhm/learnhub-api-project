@@ -76,17 +76,16 @@ class ContentHandler {
         this.updateById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = Number(req.params.id);
-                if (isNaN(id)) {
-                    return res.status(400).send({ message: "id invalid" });
-                }
+                const content = yield this.repo.getById(id);
                 const { comment, rating } = req.body;
+                if (isNaN(id))
+                    return res.status(400).send({ message: "id invalid" });
                 if (typeof comment !== "string")
                     return res.status(400).send({ message: "comment is not a string" });
                 if (typeof rating !== "number")
                     return res.status(400).send({ message: "rating is not a string" });
                 if (rating < 0 || rating > 5)
                     return res.status(400).send({ message: "rating of range 0-5" });
-                const content = yield this.repo.getById(id);
                 if (content.User.id !== res.locals.user.id)
                     throw new Error("You're not the owner of this content!");
                 const updeteData = yield this.repo.update(id, {
@@ -108,13 +107,14 @@ class ContentHandler {
         this.deleteById = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const id = Number(req.params.id);
-                const result = yield this.repo.delete(id);
                 if (isNaN(id))
                     return res.status(404).json({ message: "Not a Number" });
-                if (req.params.id !== res.locals.user.id)
+                const content = yield this.repo.getById(id);
+                if (content.User.id !== res.locals.user.id)
                     return res
                         .status(403)
                         .json({ message: "You're not the owner of this content!" });
+                const result = yield this.repo.delete(id);
                 return res.status(200).json(result).end();
             }
             catch (error) {

@@ -37,16 +37,14 @@ export interface IUserRepository {
   findById(id: string): Promise<IUser>
   getByUsername(username: string): Promise<IUser>
 }
-
+export interface IBlacklistRepository {
+  addToBlacklist(token: string, exp: number): Promise<void>
+  isAlreadyBlacklisted(token: string): Promise<boolean>
+}
 export interface IContentRepository {
   getAll(): Promise<IContent[]>
   getById(id: number): Promise<IContent>
   create(ownerId: string, content: ICreateContent): Promise<IContent>
   update(id: number, contentUpdate: ICreateUpdateDto): Promise<IContent>
   delete(id: number): Promise<Content>
-}
-
-export interface IBlackListRepository {
-  addToBlacklist(token: string, exp: Date): Promise<void>
-  isAlreadyBlacklisted(token: string): Promise<boolean>
 }

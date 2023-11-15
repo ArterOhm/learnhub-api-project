@@ -1,9 +1,12 @@
 import {PrismaClient, User} from "@prisma/client"
-import {IUser, IUserRepository} from "."
+import {IBlacklistRepository, IUser, IUserRepository} from "."
 import {ICreateUserDto} from "../dto/user"
 import {DATA_USER_SELECT} from "../const"
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/library"
 
-export default class UserRepository implements IUserRepository {
+export default class UserRepository
+  implements IUserRepository, IBlacklistRepository
+{
   private prisma: PrismaClient
   constructor(prisma: PrismaClient) {
     this.prisma = prisma
@@ -34,5 +37,28 @@ export default class UserRepository implements IUserRepository {
       where: {username},
       select: DATA_USER_SELECT,
     })
+  }
+  public async addToBlacklist(token: string, exp: number): Promise<void> {
+    await this.prisma.blacklist.create({
+      data: {token, exp: new Date(exp)},
+    })
+    return
+  }
+
+  public async isAlreadyBlacklisted(token: string): Promise<boolean> {
+    try {
+      await this.prisma.blacklist.findUniqueOrThrow({
+        where: {token},
+      })
+      return true
+    } catch (error) {
+      if (
+        error instanceof PrismaClientKnownRequestError &&
+        error.code === "P2025"
+      )
+        return false
+      console.error(error)
+      throw error
+    }
   }
 }

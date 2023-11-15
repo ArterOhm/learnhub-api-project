@@ -7,15 +7,17 @@ import {ICredentialDto, ILoginDto} from "../dto/auth"
 import {IErrorDto} from "../dto/error"
 import {ICreateUserDto, IUserDto} from "../dto/user"
 import {AuthStatus} from "../middleware/jwt"
-import {IUserRepository} from "../repositories"
+import {IBlacklistRepository, IUserRepository} from "../repositories"
 import {hashPassword, verifyPassword} from "../utils/bcrypt"
 import {IMessageDto} from "../dto/message"
 
 export default class UserHandler implements IUserHandler {
   private repo: IUserRepository
+  private blacklistRepo: IBlacklistRepository
 
-  constructor(repo: IUserRepository) {
+  constructor(repo: IUserRepository, blacklistRepo: IBlacklistRepository) {
     this.repo = repo
+    this.blacklistRepo = blacklistRepo
   }
 
   public userName: RequestHandler<
@@ -117,7 +119,9 @@ export default class UserHandler implements IUserHandler {
 
     if (!exp) return res.status(400).send({message: "Exp is missing"}).end()
 
-    // await this.BlacklistRepo.
+    await this.blacklistRepo.addToBlacklist(token, exp)
+
+    return res.status(200)
   }
 
   public registration: RequestHandler<

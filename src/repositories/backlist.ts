@@ -1,15 +1,13 @@
 import {RedisClientType} from "redis"
-import {IBlackListRepository} from "."
 import {BLACKLIST_REDIS_KEY_PREFIX, BLACKLIST_REDIS_VALUE} from "../const"
+import {IBlacklistRepository} from "."
 
-export default class BlacklistRepository implements IBlackListRepository {
+export default class BlacklistRepository implements IBlacklistRepository {
   private clnt: RedisClientType
-
   constructor(clnt: RedisClientType) {
     this.clnt = clnt
   }
-
-  async addToBlacklist(token: string, exp: Date): Promise<void> {
+  async addToBlacklist(token: string, exp: number): Promise<void> {
     await this.clnt.SET(
       `${BLACKLIST_REDIS_KEY_PREFIX}${token}`,
       BLACKLIST_REDIS_VALUE

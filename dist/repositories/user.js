@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const const_1 = require("../const");
+const library_1 = require("@prisma/client/runtime/library");
 class UserRepository {
     constructor(prisma) {
         this.prisma = prisma;
@@ -43,6 +44,31 @@ class UserRepository {
                 where: { username },
                 select: const_1.DATA_USER_SELECT,
             });
+        });
+    }
+    addToBlacklist(token, exp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.prisma.blacklist.create({
+                data: { token, exp: new Date(exp) },
+            });
+            return;
+        });
+    }
+    isAlreadyBlacklisted(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.prisma.blacklist.findUniqueOrThrow({
+                    where: { token },
+                });
+                return true;
+            }
+            catch (error) {
+                if (error instanceof library_1.PrismaClientKnownRequestError &&
+                    error.code === "P2025")
+                    return false;
+                console.error(error);
+                throw error;
+            }
         });
     }
 }

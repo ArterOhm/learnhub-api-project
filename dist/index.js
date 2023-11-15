@@ -11,14 +11,27 @@ const user_2 = __importDefault(require("./repositories/user"));
 const content_1 = __importDefault(require("./repositories/content"));
 const conent_1 = __importDefault(require("./handlers/conent"));
 const cors_1 = __importDefault(require("cors"));
+const redis_1 = require("redis");
+const const_1 = require("./const");
+const backlist_1 = __importDefault(require("./repositories/backlist"));
 const PORT = Number(process.env.PORT || 8888);
 const app = (0, express_1.default)();
 const clnt = new client_1.PrismaClient();
+const redisClnt = (0, redis_1.createClient)({
+    url: const_1.REDIS_URL,
+});
+clnt
+    .$connect()
+    .then(() => redisClnt.connect())
+    .catch((err) => {
+    console.error("Error", err);
+});
+const blacklistRepo = new backlist_1.default(redisClnt);
 const userRepo = new user_2.default(clnt);
 const contentRepo = new content_1.default(clnt);
-const userHandler = new user_1.default(userRepo);
+const userHandler = new user_1.default(userRepo, blacklistRepo);
 const contentHandler = new conent_1.default(contentRepo);
-const jwtMiddleware = new jwt_1.default();
+const jwtMiddleware = new jwt_1.default(blacklistRepo);
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.get("/", jwtMiddleware.auth, (req, res) => {
@@ -34,6 +47,7 @@ app.use("/content", contentRouter);
 userRouter.post("/", userHandler.registration);
 userRouter.get("/:username", userHandler.userName);
 authRouter.post("/login", userHandler.login);
+authRouter.get("/logout", jwtMiddleware.auth, userHandler.logout);
 authRouter.get("/me", jwtMiddleware.auth, userHandler.selfcheck);
 contentRouter.get("/", contentHandler.getAll);
 contentRouter.get("/:id", contentHandler.getById);

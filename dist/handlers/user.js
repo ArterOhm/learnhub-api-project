@@ -25,7 +25,7 @@ const jsonwebtoken_1 = require("jsonwebtoken");
 const const_1 = require("../const");
 const bcrypt_1 = require("../utils/bcrypt");
 class UserHandler {
-    constructor(repo) {
+    constructor(repo, blacklistRepo) {
         this.userName = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const UserData = __rest(yield this.repo.getByUsername(req.params.username), []);
@@ -84,6 +84,18 @@ class UserHandler {
                     .end();
             }
         });
+        this.logout = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const authHeader = req.header("AuthoriZation");
+            if (!authHeader)
+                return res.status(400).send({ message: "Authorization header is expected" });
+            const token = authHeader.replace("Bearer ", "").trim();
+            const decoded = (0, jsonwebtoken_1.verify)(token, const_1.JWT_SECRET);
+            const exp = decoded.exp;
+            if (!exp)
+                return res.status(400).send({ message: "Exp is missing" }).end();
+            yield this.blacklistRepo.addToBlacklist(token, exp);
+            return res.status(200);
+        });
         this.registration = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { name, username, password: plainPassword } = req.body;
             if (typeof name !== "string" || name.length === 0)
@@ -127,6 +139,7 @@ class UserHandler {
             }
         });
         this.repo = repo;
+        this.blacklistRepo = blacklistRepo;
     }
 }
 exports.default = UserHandler;
