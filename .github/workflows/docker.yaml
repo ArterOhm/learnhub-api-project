@@ -8,11 +8,10 @@ jobs:
     steps:
       - name: Print out hello-word
         run: echo "Hello, world."
-      - name: Print out current
-        run: pwd
       - name: Check out
         uses: actions/checkout@v3
         with:
-          sparse-checkout: .
+          username: ${{ secrets.DOKERHUB_USERNAME}}
+          prassword: ${{ secrets.DOKERHUB_TOKEN}}
       - name: Print out lists
         run: ls
